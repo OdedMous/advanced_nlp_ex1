@@ -18,5 +18,5 @@ Plots produced by Weights & Biases platform.
 
 ![alt text](https://github.com/OdedMous/advanced_nlp_ex1/blob/main/train_loss.png)
 
-![alt text](https://github.com/OdedMous/advanced_nlp_ex1/blob/main/GPU Utilization.png)
+![alt text](https://github.com/OdedMous/advanced_nlp_ex1/blob/main/GPU_Utilization.png)
 
