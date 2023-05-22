@@ -11,3 +11,12 @@ Run:
 ``` python ex1.py <number of seeds> <number of training samples> <number of validation samples> <number of prediction samples> ```
 
 Generated files are res.txt, showing model's performance, training time and prediction time, and prediction.txt, containing prediction results for all test samples.
+
+# Plots
+
+Plots produced by Weights & Biases platform.
+
+![alt text](https://github.com/OdedMous/advanced_nlp_ex1/blob/main/train_loss.png)
+
+![alt text](https://github.com/OdedMous/advanced_nlp_ex1/blob/main/GPU Utilization.png)
+
