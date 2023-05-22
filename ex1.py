@@ -18,8 +18,6 @@ from transformers import (TrainingArguments,
 # Set this to TRUE to report results in Weights&Biases
 ENABLE_WANDB = False
 
-
-
 def reduce_dataset_size(dataset, max_samples : int):
 
     if max_samples > 0:
@@ -80,7 +78,7 @@ def do_finetuning(model_name : str,
 
     for seed in range(seeds_num):
 
-        print(f"Finetuning {model_name} with seed {seed}...")
+        print(f"Fine-tuning {model_name} with seed {seed}....")
 
         if ENABLE_WANDB:
             # set the wandb project where this run will be logged
@@ -183,7 +181,7 @@ def main():
 
     open('res.txt', 'w').close()
 
-    for model_name in  ['bert-base-uncased', 'roberta-base', 'google/electra-base-generator']:
+    for model_name in ['bert-base-uncased', 'roberta-base', 'google/electra-base-generator']:
 
         tokenizer = AutoTokenizer.from_pretrained(model_name)
         train_dataset, eval_dataset, test_dataset = preprocess_datasets(raw_datasets, tokenizer, max_train_samples,
