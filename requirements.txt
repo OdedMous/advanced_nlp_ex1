@@ -1,0 +1,5 @@
+datasets==2.11.1.dev0
+evaluate==0.4.0
+numpy==1.22.3
+torch==1.12.1
+transformers==4.29.2
