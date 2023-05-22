@@ -22,4 +22,4 @@ Plots produced by Weights & Biases platform.
 
 # Run on Google Colab
 
-In order to utilize google colab GPU, one can simply paste the code from ex1.py to a code snippet (need only change the command-line arguments manually).
+In order to utilize google colab GPU, one can simply paste the code from ex1.py to a code snippet and change runtime to GPU ( + need to change the command-line arguments manually).
