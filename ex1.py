@@ -12,8 +12,13 @@ from transformers import (TrainingArguments,
                           AutoModelForSequenceClassification,
                           AutoTokenizer,
                           EvalPrediction,
-                          Trainer,
-                          )
+                          Trainer)
+
+
+# Set this to TRUE to report results in Weights&Biases
+ENABLE_WANDB = False
+
+
 
 def reduce_dataset_size(dataset, max_samples : int):
 
@@ -64,7 +69,7 @@ def do_finetuning(model_name : str,
                   tokenizer: AutoTokenizer,
                   train_dataset: Dataset,
                   eval_dataset: Dataset,
-                  device: str):
+                  device):
 
     model = AutoModelForSequenceClassification.from_pretrained(model_name).to(device)
 
@@ -73,12 +78,16 @@ def do_finetuning(model_name : str,
     acc_list = []
     train_times = []
 
-    for seed in [123]: #range(seeds_num):
+    for seed in range(seeds_num):
 
         print(f"Finetuning {model_name} with seed {seed}...")
 
-        # set the wandb project where this run will be logged
-        wandb.init(project="advanced-nlp-ex1", name=f"{model_name}_seed_#{seed}")
+        if ENABLE_WANDB:
+            # set the wandb project where this run will be logged
+            wandb.init(project="my_anlp", name=f"{model_name}_seed_#{seed}")
+            report_to = "wandb"
+        else:
+            report_to = 'none'
 
         # Define metric
         accuracy_metric = evaluate.load("accuracy")
@@ -87,7 +96,7 @@ def do_finetuning(model_name : str,
         training_args = TrainingArguments(seed=seed,
                                           do_train=True,
                                           output_dir=os.getcwd(),
-                                          report_to="wandb",
+                                          report_to=report_to,
                                           logging_steps=500,  # after how many step to push loss value into wandb
                                           save_total_limit=1 #  save only the last checkpoint (note that the loss will be still calculated after each logging_steps and will be reported to Weights&Biases)
                                           )  # save_strategy="no # We don't need eval during training in our ex1
@@ -110,8 +119,9 @@ def do_finetuning(model_name : str,
         # note that "model.eval()" is already done inside trainer.evaluate/predict functions
         metrics = trainer.evaluate(eval_dataset=eval_dataset)
 
-        wandb.log(metrics)
-        wandb.finish()
+        if ENABLE_WANDB:
+           wandb.log(metrics)
+           wandb.finish()
 
         acc = metrics['eval_accuracy']
         acc_list.append(acc)
@@ -141,8 +151,6 @@ def do_predict(trainer: Trainer, test_dataset) -> float:
     raw_preds = prediction_results.predictions  # probabilities for each class
     preds = np.argmax(raw_preds, axis=-1)
 
-    print(preds)
-
     # Write predictions to file
     with open('predictions.txt', 'w', encoding="utf-8") as f:
         for org_sentence, label in zip(test_dataset['text'], preds):
@@ -155,10 +163,11 @@ def do_predict(trainer: Trainer, test_dataset) -> float:
 def main():
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    print("Avilable device:", device)
+    print("Available device:", device)
 
-    # key is taken from: https://wandb.ai/oded_mous
-    wandb.login(key="2c67bb9c3b03e5a2e7c662865f19f99a34bb2e36")
+    if ENABLE_WANDB:
+       # take key from your username page in: https://wandb.ai
+       wandb.login() # key="???"
 
     args = sys.argv
     seeds_num = int(args[1])
@@ -174,7 +183,7 @@ def main():
 
     open('res.txt', 'w').close()
 
-    for model_name in ['bert-base-uncased']: # ['bert-base-uncased', 'roberta-base', 'google/electra-base-generator']:
+    for model_name in  ['bert-base-uncased', 'roberta-base', 'google/electra-base-generator']:
 
         tokenizer = AutoTokenizer.from_pretrained(model_name)
         train_dataset, eval_dataset, test_dataset = preprocess_datasets(raw_datasets, tokenizer, max_train_samples,
